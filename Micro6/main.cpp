@@ -1,9 +1,4 @@
-//
-//  main.cpp
-//  Micro1_2
-//
-//  Created by Исыпов Илья on 12.11.2020.
-//
+
 
 #include <iostream>
 #include <string>
@@ -14,15 +9,13 @@
 #include <fstream>
 #include <dirent.h>
 #include <csignal>
-#include <sys/types.h>      /* needed to use pid_t, etc. */
-#include <sys/wait.h>       /* needed to use wait() */
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>         /* LINUX constants and functions (fork(), etc.) */
+#include <unistd.h>
 #include <fcntl.h>
 using namespace std;
-int ended = 1;
-vector< vector<char *> > argv1;
 
 
 void ProcessTime() {
@@ -40,7 +33,6 @@ void ProcessTime() {
 
 
 void PipConv(vector< vector<char *> > & argv, int n) {
-    //conveer
     for (int i = 0; i < n - 1; i++) {
         int fd[2];
     pipe(fd);
@@ -55,27 +47,8 @@ void PipConv(vector< vector<char *> > & argv, int n) {
             dup2(fd[0], 0);
         }
     }
-    //ended = 1;
-    //close(1);
-    //string b = "b";
-    //const char *name1 = b.c_str();
-    //open(name1, O_RDWR | O_CREAT |O_TRUNC, 0666);
-    cout << "ok";
+    
     execvp(argv[n-1][0], &argv[n-1][0]);
-    /*
-    pid_t t = fork();
-    if (t == 0) {
-        execvp(argv[n-1][0], &argv[n-1][0]);
-        exit(0);
-    } else {
-        int info;
-        waitpid(t, &info, 0);
-    }
-     */
-    
-    
-    //stdin.clear();
-    //ended = 1;
     exit(0);
 }
 
@@ -83,25 +56,19 @@ void PipConv(vector< vector<char *> > & argv, int n) {
 string CurDir () {
     char dir[FILENAME_MAX];
     getcwd(dir, FILENAME_MAX);
-    //for (int i = 0; i < 10; i++) cout << dir[i];
     string CD = string(dir);
     return CD;
 }
 
 void ExecPwd1() {
-    //close(1);//descriptor вывода
-    //const char *name1 = a.c_str();
-    //int t = open(name1, O_RDWR | O_CREAT |O_TRUNC, 0666);
-    
     
     cout << CurDir() << "\n";
    
-    //close(t);
+    
 }
 
 int ExecCd(vector<string> &command) {
-    //cout <<"cd str"<<command[1];
-    cout <<"CD\n";
+
     if(command.size() != 2) {
         cout << "cd size error"<<endl;
         return 0;
@@ -179,7 +146,7 @@ void lsdir (string const &name, bool recursive, vector<string> &ret) {
 int StarSubsDir(string word1, vector<string> &variants) {
     
     string dir = CurDir();
-    //cout <<"DIR: "<<dir<<endl;
+    
     vector<string> files;
     lsdir(dir, true, files);
     for (auto file: files) {
@@ -190,14 +157,11 @@ int StarSubsDir(string word1, vector<string> &variants) {
         
         char *word = new char[file.length() + 1];
         strcpy(word, file.c_str());
-        //Acception(word, rv);
+        
         if(Acception(word, rv) == 1) {
-            //cout <<"file: "<<file<<endl;
-            //cout << "oki " << file<<endl;
             variants.push_back(file);
         }
     }
-    //cout <<"END for "<<word1<<endl;
     
     return 1;
 }
@@ -214,9 +178,9 @@ int StarSubs(string word1, vector<string> &variants) {
         
         char *word = new char[file.length() + 1];
         strcpy(word, file.c_str());
-        //Acception(word, rv);
+        
         if(Acception(word, rv) == 1) {
-            //cout << "oki " << file<<endl;
+          
             variants.push_back(file);
         }
     }
@@ -232,11 +196,9 @@ int StarDir(string direction, string start_dir, vector<string> &variants) {
         StarSubs("*", vars);
         for (vector<string>::iterator it = vars.begin() ; it!=vars.end() ; ++it) {
             variants.push_back("/"+*it);
-            //cout <<"VARS: " <<*it <<endl;
         }
         return 1;
     }
-    //string start_dir = CurDir();
     vector<string> dirs = {""};
     //разбиваем по '/'
     for(int i = 1; i < direction.size(); i++) {
@@ -249,25 +211,16 @@ int StarDir(string direction, string start_dir, vector<string> &variants) {
     int i;
     for(i = 0; i < dirs.size(); i++) {
         if((dirs[i].find('*') == -1) && (dirs[i].find('?') == -1)) {
-            //cout <<"dobav"<<dirs[i]<<endl;
             go_dir+="/"+dirs[i];
         } else {
             break;
         }
-        //cout << dirs[i] <<"&"; cout << endl;
+        
     }
-    //cout<<"godir: "<<go_dir<<endl;
+    //cout <<"ok1\n";
     if (i == dirs.size()) {
         vector<string> vars;
-        //cout << "oop"<< i <<endl;
-        //cout <<"dirgo: "<<dirs[i - 1]<<endl;
         if(chdir(go_dir.c_str()) != -1) variants.push_back(go_dir);
-        /*
-        StarSubsDir(dirs[i - 1], vars);
-        if(vars.size()!=0)
-            //cout << "pushim:"<<direction<<endl;
-            variants.push_back(direction);
-         */
         return 0;
     }
     //cout <<"go dir "<<go_dir<<endl;
@@ -315,10 +268,10 @@ int StarLine(vector<string> &commands) {
             string start_dir = CurDir();
             vector<string> variants = {};
             chdir("/");
-            //cout << "comi: "<<commands[i]<<endl;
             StarDir(commands[i], CurDir(), variants);
-            //cout <<"Answer\n";
+            chdir(start_dir.c_str());
             for (vector<string>::iterator it = variants.begin() ; it!=variants.end() ; ++it) {
+                cout <<"vars: "<< *it << endl;
                 commands1.push_back(*it);
                 //cout << *it<<endl;
             }
@@ -334,7 +287,7 @@ int StarLine(vector<string> &commands) {
             StarSubs(commands[i], variants);
             for (vector<string>::iterator it = variants.begin() ; it!=variants.end() ; ++it) {
                 commands1.push_back(*it);
-                   // cout<<*it <<endl;
+                   
             }
             if(variants.size() == 0) {
                 cout << "no coincedence" << endl;
@@ -347,46 +300,6 @@ int StarLine(vector<string> &commands) {
         
     }
     commands = commands1;
-    return 0;
-}
-
-int ExecCom(vector<string> command, string a, string b, int k){
-    vector<char *> arg;
-    for (int i = 0; i < command.size(); ++i) {
-        //cout << "comi:"<<command[i].c_str()<<endl;
-        arg.push_back((char *) command[i].c_str());
-    }
-    arg.push_back(NULL);
-    
-    
-    //int fd[2];
-    //pipe(fd);
-        pid_t pid = fork();
-        if (pid == 0) {
-            //cout << "ok3";
-            if(k!=0) {
-                close(0);//descriptor ввода
-                const char *name = a.c_str();
-                open(name, O_RDWR | O_CREAT, 0666);
-            }
-            close(1);//descriptor вывода
-            const char *name1 = b.c_str();
-            open(name1, O_RDWR | O_CREAT |O_TRUNC, 0666);
-            //cout << "ok4"<<arg[0]<<endl;
-            execvp(arg[0], &arg[0]);
-            //cout << "ok6";
-        } else {
-            int info;
-            //string line;
-            //close(0);
-            //const char *name = a.c_str();
-            //int t = open(name, O_RDWR | O_CREAT, 0666);
-            //dup2(t, 0);
-            
-            waitpid(pid, &info, 0);
-            //close(t);
-            //dup2(0,0);
-        }
     return 0;
 }
 
@@ -403,14 +316,13 @@ void Out(vector<string> commands, string &filename, int sign, string &inoutfile,
         pid_t pid = fork();
         if (pid == 0) {
             if(k != 0) {
-                close(0);//descriptor ввода
+                close(0);
                 const char *name1 = inoutfile.c_str();
                 open(name1, O_RDWR | O_CREAT, 0666);
             }
-            close(1);//descriptor вывода
+            close(1);
             const char *name = filename.c_str();
             open(name, O_RDWR | O_CREAT | O_TRUNC, 0666);
-            //делаем а файлом вывода
             execvp(cod.c_str(), &args[0]);
         } else {
             int info;
@@ -426,11 +338,9 @@ void Out(vector<string> commands, string &filename, int sign, string &inoutfile,
             close(1);
             const char *name1 = inoutfile.c_str();
             open(name1, O_RDWR | O_CREAT | O_TRUNC, 0666);
-            //делаем а файлом ввода.
             execvp(cod.c_str(), &args[0]);
         } else {
             int info;
-            //cout << info;
             waitpid(pid, &info, 0);
         }
     }
@@ -444,18 +354,17 @@ void Out2(vector<string> commands, string &filename1, string &filename2) {
     }
     args.push_back(NULL);
     
-    
     //cases com < a > b & com > a < b
     int fd[2];
     pipe(fd);
     // fn1 > com > fn2
         pid_t pid = fork();
         if (pid == 0) {
-            close(0);//descriptor ввода
+            close(0);
             const char *name = filename1.c_str();
             open(name, O_RDWR | O_CREAT, 0666);
             
-            close(1);//descriptor вывода
+            close(1);
             const char *name1 = filename2.c_str();
             open(name1, O_RDWR | O_CREAT | O_TRUNC, 0666);
             execvp(cod.c_str(), &args[0]);
@@ -484,17 +393,14 @@ int LineExec1(deque<vector<string>> &commands) {
         for (long i = 0; i < len; i++) {
             //cout <<"com i:" << command[i]<<endl;
             if(command[i].find('*')!=-1 || command[i].find('?')!=-1 || command[i].find('/')!=-1) {
-                //удаляем *?
                 StarLine(commands[w]);
-                //cout <<"com:\n";
-                //for(int z = 0; z < commands[w].size(); z++) cout <<commands[w][z]<< endl;
+                
                 break;
             }
         }
         
         for (long i = 0; i < len; i++) {
             if(command[i] == "<" || command[i] == ">") {
-                //cout << "comi:" << command[i]<<endl;
                 p++;
             }
         }
@@ -539,17 +445,9 @@ int LineExec1(deque<vector<string>> &commands) {
                     } else {
                         //cout << "ok";
                         fin = command[command.size() - 1];
-                        //cout <<"to erase: "<< commands[w][command.size()-1]<<endl;
-                        //cout <<"to erase: "<< commands[w][command.size()-2]<<endl;
                         commands[w].pop_back();
                         commands[w].pop_back();
-                        //commands[w].
-                        //command[w].pop_back();
-                        //cout << "end:"<< command[command.end()];
-                        //command.erase(command.end() - 1);
-                        //command[w].erase(command.end());
-                        //Out(command, command[command.size() - 1], 0, b, k);
-                        //return 1;
+                        
                     }
                 //if(k == 0)
                 }
@@ -562,19 +460,7 @@ int LineExec1(deque<vector<string>> &commands) {
                         fout = command[command.size() - 1];
                         commands[w].pop_back();
                         commands[w].pop_back();
-                        //cout << "ok >\n";
-                        //if(k%2 == 1) {
-                            //Out(command, command[command.size() - 1], 1, b, k);
-                        //} else {
-                            //Out(command, command[command.size() - 1], 1, a, k);
-                        //}
-                        //чистим вывод
-                        //ofstream fout1;
-                        //fout1.open(a);
-                        //fout1.close();
-                        //fout1.open(b);
-                        //fout1.close();
-                        //return 1;
+                       
                     }
                 } else {
                     cout <<"Error in <(>) format\n";
@@ -599,35 +485,20 @@ int LineExec1(deque<vector<string>> &commands) {
     }
         k++;
     }
-    
-    //cout << commands.size()<<endl;
-    
+   
     vector< vector<char *> > argv;
     for(int i = 0; i < qnt; i++) {
         
         vector<char *> arg;
         for (int j = 0; j < commands[i].size(); j++) {
-            //cout << "comi:"<<commands[i][j].c_str()<<endl;
             arg.push_back((char *) commands[i][j].c_str());
         }
         arg.push_back(NULL);
         
         argv.push_back(arg);
     }
-    //cout <<"ravn:"<<(argv == argv1);
-    //argv1 = argv;
     
-    for(int i = 0; i < qnt; i++) {
-        for(int j = 0; j < argv[i].size() ; j++) {
-           //cout <<"ravn:"<<i<<" "<<j<<" "<<(argv[i][j] == argv1[i][j])<<endl;
-            //cout << argv[i][j]<<endl;
-            //argv1 = argv;
-            //cout <<"look:"<< argv[i][j] << endl;
-        }
-    }
-   
-    //cout << "fin: "<< fin<<endl;
-    //cout <<"checking1\n";
+    
     pid_t pid = fork();
             if (pid == 0) {
             //signal(2, SIG_DFL);
@@ -642,7 +513,7 @@ int LineExec1(deque<vector<string>> &commands) {
             PipConv(argv, qnt);
             } else {
             int status;
-            //wait(&status);
+            
             waitpid(pid, &status, 0);
                 
             }
@@ -651,16 +522,6 @@ int LineExec1(deque<vector<string>> &commands) {
         cerr <<"walltime "<<(double) (end_t - start_t) / 1000 <<" sec"<<endl;
         ProcessTime();
     }
-    //cout <<"checking2\n";
-    //EPIP(argv, qnt);
-    /*
-    for(int i = 0; i < qnt; i++) {
-        for(int j = 0; j < argv[i].size() - 1; j++) {
-            cout << argv[i][j] << endl;
-        }
-    }
-    */
-    
     
     return 1;
 }
@@ -668,7 +529,7 @@ int LineExec1(deque<vector<string>> &commands) {
 
 int LineProcessing(string line){
     //разбиваем каждую команду на string элементы
-    //cout <<"line: "<<line<<endl;
+    
     deque<vector<string>> commands;
     commands.push_back(vector<string>());
     //long len = line.length();
@@ -682,59 +543,22 @@ int LineProcessing(string line){
     {
         string s = word;
         if (s == "|"){
-            //cout << "\n";
+
             commands.push_back(vector<string>());
-            //commands содержат компоненты конвеера
         }
         else {
-            //cout << s;
+     
             commands.back().push_back(s);
         }
         word = strtok(NULL, " \t\r\n\a");
     }
-    //cout <<"oop\n";
-    //CommandsExec(commands);
+    
     LineExec1(commands);
-    //cout <<"checking3\n";
+    
     return 1;
-    /*
-    int t = commands.size();
-    cout << "com qnt:" << t <<"\n";
-    for (int i = 0; i < t; i++) {
-        for(int j = 0; j < commands[i].size(); j++) cout << commands[i][j] << " ";
-        cout << endl;
-    }
-     */
 }
 
-int start1(){
-    string UserName = getenv("USER");
-    
-    
-
-    chdir("/Users/isypov/Desktop/test");
-    //
-
-    while(! feof(stdin)){
-        cout <<CurDir();
-        if (UserName == "root") {
-            cout << "!";
-        } else {
-            cout << ">";
-        }
-        string line;
-        //getline(cin, line);
-        while(line.length() == 0) {
-            getline(cin, line);
-        }
-        LineProcessing(line);
-        }
-        
-    return 1;
-   
-}
-
-int start(){
+int Microsha(){
     string UserName = getenv("USER");
     string pn;
     string line;
@@ -743,54 +567,29 @@ int start(){
     } else {
         pn = ">";
     }
-    //chdir("/Users/isypov/Desktop/test");
-    //
     while(! feof(stdin)){
         
         cout <<CurDir() << pn;
         
         if(getline(cin, line)){
         if(line.length()!= 0 ) {
-            //cout << "look:" << line << endl;
+            
             LineProcessing(line);
-            //getline(cin, line);
-        
-        
-            //else return 1;
+            
         }
         else break;
-            //else
         }
-        //else return 1;
-        //cout << "work\n";
+    
     }
     return 1;
    
 }
 
-int proc;
-void signal_handler(int signal) {
-    cout << "hell\n";
-    if (proc) {
-        cout << endl;
-        cout << "home"<<endl;
-    }
-}
-
 
 int main(int argc, const char * argv[]) {
-    proc = 1;
     chdir("/Users/isypov/Desktop/test");
-    start();
+    Microsha();
     
-    //deque<vector<string> > commands = {{"cat", "<", "a"},{"cat1"},{"cat2", ">", "b"}};
-    //deque<vector<string> > commands = {{"ls", "-l", "a"},{"cat"},{"cat"},{"cat"},{"cat"}};
-    //deque<vector<string> > commands = {{"ls", "-lR", "/"},{"more"}};
-    //deque<vector<string> > commands = {{"cat", "<", "a"},{"cat"},{"cat", ">", "b"}};
-    //deque<vector<string> > commands = {{"ls", "-l", "b", "a"}};
-    //cout << commands[1].size();
-    //LineExec1(commands);
-    //cout <<"hello";
     return 0;
 }
 
