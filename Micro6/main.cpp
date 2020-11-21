@@ -587,7 +587,7 @@ int Microsha(){
 
 
 int main(int argc, const char * argv[]) {
-    chdir("/Users/isypov/Desktop/test");
+    //chdir("/Users/isypov/Desktop/test");
     Microsha();
     
     return 0;
