@@ -250,7 +250,7 @@ int StarDir(string direction, string start_dir, vector<string> &variants) {
         //cout <<"tale: "<< tale << endl;
         //cout << go_dir + "/" + *it + "/" + tale << endl;
         if(tale!="" && tale!="/") {
-            cout <<"kuda: "<< go_dir + "/" + *it + "/" + tale<<endl;
+            //cout <<"kuda: "<< go_dir + "/" + *it + "/" + tale<<endl;
             StarDir(go_dir + "/" + *it + "/" + tale, start_dir, variants);
         }
         else {
@@ -276,7 +276,7 @@ int StarLine(vector<string> &commands) {
             StarDir(commands[i], CurDir(), variants);
             chdir(start_dir.c_str());
             for (vector<string>::iterator it = variants.begin() ; it!=variants.end() ; ++it) {
-                cout <<"vars: "<< *it << endl;
+                //cout <<"vars: "<< *it << endl;
                 commands1.push_back(*it);
                 //cout << *it<<endl;
             }
@@ -595,7 +595,7 @@ int Microsha(){
 
 
 int main(int argc, const char * argv[]) {
-    chdir("/Users/isypov/Desktop/test");
+    //chdir("/Users/isypov/Desktop/test");
     
     //signal(SIGINT, SIG_IGN);
     Microsha();
