@@ -32,6 +32,7 @@ void ProcessTime() {
 }
 
 
+
 void PipConv(vector< vector<char *> > & argv, int n) {
     for (int i = 0; i < n - 1; i++) {
         int fd[2];
@@ -227,11 +228,15 @@ int StarDir(string direction, string start_dir, vector<string> &variants) {
     string tale = "";
     int j;
     for (j = i+1; j < dirs.size() - 1; j++) {
+        //cout <<"dirs j"<<dirs[j]<<endl;
+        cout <<"ok?/n";
         if(dirs[j]!="")
             tale+=dirs[j] + "/";
     }
-    if(dirs[j]!="")
-        tale+=dirs[j];
+    if (j == dirs.size() - 1){
+        if(dirs[j]!="")
+            tale+=dirs[j];
+    }
     //cout << "dir i " << dirs[i] << endl;
     if(chdir(go_dir.c_str()) == -1 && go_dir!="") return 0;
     //cout << "here :" << CurDir();
@@ -245,7 +250,7 @@ int StarDir(string direction, string start_dir, vector<string> &variants) {
         //cout <<"tale: "<< tale << endl;
         //cout << go_dir + "/" + *it + "/" + tale << endl;
         if(tale!="" && tale!="/") {
-            //cout <<"kuda: "<< go_dir + "/" + *it + "/" + tale<<endl;
+            cout <<"kuda: "<< go_dir + "/" + *it + "/" + tale<<endl;
             StarDir(go_dir + "/" + *it + "/" + tale, start_dir, variants);
         }
         else {
@@ -558,10 +563,13 @@ int LineProcessing(string line){
     return 1;
 }
 
+
 int Microsha(){
     string UserName = getenv("USER");
     string pn;
     string line;
+    //SigCreate();
+    
     if (UserName == "root") {
         pn = "!";
     } else {
@@ -573,7 +581,7 @@ int Microsha(){
         
         if(getline(cin, line)){
         if(line.length()!= 0 ) {
-            
+            //raise( SIGINT);
             LineProcessing(line);
             
         }
@@ -587,7 +595,9 @@ int Microsha(){
 
 
 int main(int argc, const char * argv[]) {
-    //chdir("/Users/isypov/Desktop/test");
+    chdir("/Users/isypov/Desktop/test");
+    
+    //signal(SIGINT, SIG_IGN);
     Microsha();
     
     return 0;
