@@ -17,7 +17,6 @@
 #include <fcntl.h>
 using namespace std;
 
-
 void ProcessTime() {
 
     struct rusage usage;
@@ -30,8 +29,6 @@ void ProcessTime() {
     cerr << "user " << user_tv.tv_sec <<"."<<user_tv.tv_usec<<" sec"<<endl;
     cerr << "system " << sys_tv.tv_sec <<"."<<sys_tv.tv_usec<<" sec"<<endl;
 }
-
-
 
 void PipConv(vector< vector<char *> > & argv, int n) {
     for (int i = 0; i < n - 1; i++) {
@@ -53,12 +50,29 @@ void PipConv(vector< vector<char *> > & argv, int n) {
     exit(0);
 }
 
+int work = 1;
 
 string CurDir () {
     char dir[FILENAME_MAX];
     getcwd(dir, FILENAME_MAX);
     string CD = string(dir);
     return CD;
+}
+
+void CtrlC (int signal){
+    string UserName = getenv("USER");
+    string pn;
+    string line;
+    
+    if (UserName == "root") {
+        pn = "!";
+    } else {
+        pn = ">";
+    }
+    if (work) {
+        cout << endl;
+        cout <<CurDir() << pn;
+    }
 }
 
 void ExecPwd1() {
@@ -82,7 +96,6 @@ int ExecCd(vector<string> &command) {
     }
     
 }
-
 
 int Acception(char *word, char *rv) {
     if(*word == 0) return *rv == 0 | *rv == '/'| (*rv == '*' && strlen(rv) == 1 );
@@ -263,7 +276,6 @@ int StarDir(string direction, string start_dir, vector<string> &variants) {
     }
     return 0;
 }
-
 
 int StarLine(vector<string> &commands) {
     //подставляем вместо *? в строке
@@ -531,7 +543,6 @@ int LineExec1(deque<vector<string>> &commands) {
     return 1;
 }
 
-
 int LineProcessing(string line){
     //разбиваем каждую команду на string элементы
     
@@ -563,7 +574,6 @@ int LineProcessing(string line){
     return 1;
 }
 
-
 int Microsha(){
     string UserName = getenv("USER");
     string pn;
@@ -581,12 +591,14 @@ int Microsha(){
         
         if(getline(cin, line)){
         if(line.length()!= 0 ) {
+            //work = 0;
             //raise( SIGINT);
             LineProcessing(line);
             
         }
         else break;
         }
+        work = 1;
     
     }
     return 1;
@@ -595,9 +607,9 @@ int Microsha(){
 
 
 int main(int argc, const char * argv[]) {
-    //chdir("/Users/isypov/Desktop/test");
+    chdir("/Users/isypov/Desktop/test");
     
-    //signal(SIGINT, SIG_IGN);
+    signal(SIGINT, CtrlC);
     Microsha();
     
     return 0;
